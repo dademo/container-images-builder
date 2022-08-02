@@ -1,0 +1,18 @@
+---
+
+podman:
+  base_url: unix:///run/user/1000/podman/podman.sock
+
+registries:
+  docker.io:
+    username: dademo0
+    dockercfg_path: /home/dademo/.docker/config.json
+
+images:
+  nexus.dademo.fr:5005/build_images/gradle_runner:
+    path: images/gradle_runner
+    dockerfile: Containerfile
+    squash: true
+    tags:
+      - latest
+      - 0.0.1

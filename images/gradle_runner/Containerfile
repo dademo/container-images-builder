@@ -1,0 +1,23 @@
+FROM docker.io/library/busybox:glibc
+
+ARG GRADLE_VERSION=7.5
+
+RUN mkdir /gradle && \
+    wget "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" -O - | unzip -o - -d /    && \
+    mv /gradle-${GRADLE_VERSION}/* /gradle/
+
+FROM registry.access.redhat.com/ubi8/ubi
+
+RUN useradd -m -d /app -U gradle
+COPY --chown=gradle:gradle --from=0 /gradle /gradle
+
+RUN dnf -y install java-17-openjdk-headless && \
+    dnf clean all                           && \
+    rm -rf /var/cache/yum                   && \
+    chmod +x /gradle/bin/*
+
+USER gradle:gradle
+ENV PATH="/gradle/bin:${PATH}"
+WORKDIR /app
+
+CMD gradle --help
